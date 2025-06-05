@@ -5,8 +5,8 @@ LOG_FILE="/var/log/snort/snort_igc122391/alert"
 
 TODAY=$(date +"%m/%d/%y")
 
-ZBX_SERVER="x"
-ZBX_HOST="x"
+ZBX_SERVER="74.163.81.252"
+ZBX_HOST="PFSENSE-FOR"
 
 TCP=$(grep "^$TODAY" "$LOG_FILE" | grep ",TCP," | wc -l)
 UDP=$(grep "^$TODAY" "$LOG_FILE" | grep ",UDP," | wc -l)
