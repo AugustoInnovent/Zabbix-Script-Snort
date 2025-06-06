@@ -20,7 +20,7 @@ for PORT in $PORTS; do
 done
 echo "]}" >> "$DISCOVERY_FILE"
 
-zabbix_sender -z "$ZBX_SERVER" -s "$ZBX_HOST" -k snort.port.discovery -o "$(cat $DISCOVERY_FILE)"
+zabbix_sender -z 74.163.81.252 -s "PFSENSE-FOR" -k snort.port.discovery -o "$(cat $DISCOVERY_FILE)"
 
 > "$DATA_FILE"
 for PORT in $PORTS; do
