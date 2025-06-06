@@ -3,19 +3,29 @@
 LOG_FILE="/var/log/snort/snort_igc122391/alert"
 ZBX_SERVER="74.163.81.252"
 ZBX_HOST="PFSENSE-FOR"
-TMP_FILE="/tmp/snort_ports.csv"
-ZBX_DATA="/tmp/zabbix_snort_data.txt"
+TMP_DIR="/tmp"
+DISCOVERY_FILE="$TMP_DIR/snort_lld.json"
+DATA_FILE="$TMP_DIR/snort_data.txt"
 
-cut -d',' -f11 "$LOG_FILE" | \
-  grep -E '^[0-9]+$' | \
-  sort | uniq -c | sort -nr | head -n 5 > "$TMP_FILE"
+PORTS=$(cut -d',' -f11 "$LOG_FILE" | sort -n | uniq)
 
-> "$ZBX_DATA"
+echo -n '{"data":[' > "$DISCOVERY_FILE"
+FIRST=1
+for PORT in $PORTS; do
+    if [ $FIRST -eq 0 ]; then
+        echo -n "," >> "$DISCOVERY_FILE"
+    fi
+    echo -n "{\"{#PORT}\":\"$PORT\"}" >> "$DISCOVERY_FILE"
+    FIRST=0
+done
+echo "]}" >> "$DISCOVERY_FILE"
 
-while read -r COUNT PORT; do
-    echo "\"PFSENSE-FOR\" snort.port[$PORT] $COUNT" >> "$ZBX_DATA"
-done < "$TMP_FILE"
+zabbix_sender -z "$ZBX_SERVER" -s "$ZBX_HOST" -k snort.port.discovery -o "$(cat $DISCOVERY_FILE)"
 
-zabbix_sender -z 74.163.81.252 -i "$ZBX_DATA"
+> "$DATA_FILE"
+for PORT in $PORTS; do
+    COUNT=$(cut -d',' -f11 "$LOG_FILE" | grep -c "^$PORT$")
+    echo "\"$ZBX_HOST\" snort.port[$PORT] $COUNT" >> "$DATA_FILE"
+done
 
-rm -f "$TMP_FILE" "$ZBX_DATA"
+zabbix_sender -z 74.163.81.252 -i "$DATA_FILE"
