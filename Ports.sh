@@ -10,4 +10,4 @@ PORT_STATS=$(awk -F',' '{print $8}' "$LOG" | sort | uniq -c | sort -nr | head -n
 PORT_STATS="$PORT_STATS\n"
 PORT_STATS="$PORT_STATS\n$(awk -F',' '{print $10}' "$LOG" | sort | uniq -c | sort -nr | head -n 5)"
 
-echo "$PORT_STATS" | /usr/local/bin/zabbix_sender -z 74.163.81.252 -s "PFSENSE-FOR" -k "net.topports.snort" -T -i -
+echo "$PORT_STATS" | /usr/local/bin/zabbix_sender -z 74.163.81.252 -s "PFSENSE-FOR" -k "net.topports.snort" -T -i
