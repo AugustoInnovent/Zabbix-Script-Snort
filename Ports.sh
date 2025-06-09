@@ -1,9 +1,9 @@
 #!/bin/sh
 
-ZABBIX_HOST="PFSENSE-FOR"                          
-ZABBIX_SERVER="74.163.81.252"                     
-ZABBIX_KEY="net.topports.snort"                   
-LOG="/var/log/snort/snort_igc122391/alert"         
+ZABBIX_HOST="PFSENSE-FOR"
+ZABBIX_SERVER="74.163.81.252"
+ZABBIX_KEY="net.topports.snort"
+LOG="/var/log/snort/snort_igc122391/alert"
 
 if [ ! -f "$LOG" ]; then
   echo "Arquivo de log não encontrado: $LOG"
@@ -11,9 +11,10 @@ if [ ! -f "$LOG" ]; then
 fi
 
 TMP_LOG=$(mktemp)
+
 for i in 0 1 2; do
-  DIA=$(date -v-"$i"d +%y/%m/%d)
-  grep "^$DIA" "$LOG" >> "$TMP_LOG"
+  DIA=$(date -v-"$i"d +%y/%m/%d)   
+  grep "^$DIA-" "$LOG" >> "$TMP_LOG"
 done
 
 if [ ! -s "$TMP_LOG" ]; then
