@@ -1,31 +1,15 @@
 #!/bin/sh
 
-LOG_FILE="/var/log/snort/snort_igc122391/alert"
-ZBX_SERVER="74.163.81.252"
-ZBX_HOST="PFSENSE-FOR"
-TMP_DIR="/tmp"
-DISCOVERY_FILE="$TMP_DIR/snort_lld.json"
-DATA_FILE="$TMP_DIR/snort_data.txt"
+# Caminho do log do Snort (ajuste se for diferente)
+LOG="/var/log/snort/snort_igc122391/alert"
 
-PORTS=$(cut -d',' -f11 "$LOG_FILE" | sort -n | uniq)
+# Número de portas mais utilizadas a mostrar
+TOP=10
 
-echo -n '{"data":[' > "$DISCOVERY_FILE"
-FIRST=1
-for PORT in $PORTS; do
-    if [ $FIRST -eq 0 ]; then
-        echo -n "," >> "$DISCOVERY_FILE"
-    fi
-    echo -n "{\"{#PORT}\":\"$PORT\"}" >> "$DISCOVERY_FILE"
-    FIRST=0
-done
-echo "]}" >> "$DISCOVERY_FILE"
+# Extraindo portas origem e destino e mostrando as mais frequentes
+echo "Top $TOP portas de ORIGEM:"
+awk -F',' '{print $8}' "$LOG" | sort | uniq -c | sort -nr | head -n $TOP
 
-zabbix_sender -z 74.163.81.252 -s "PFSENSE-FOR" -k snort.port.discovery -o "$(cat $DISCOVERY_FILE)"
-
-> "$DATA_FILE"
-for PORT in $PORTS; do
-    COUNT=$(cut -d',' -f11 "$LOG_FILE" | grep -c "^$PORT$")
-    echo "\"$ZBX_HOST\" snort.port[$PORT] $COUNT" >> "$DATA_FILE"
-done
-
-zabbix_sender -z 74.163.81.252 -i "$DATA_FILE"
+echo ""
+echo "Top $TOP portas de DESTINO:"
+awk -F',' '{print $10}' "$LOG" | sort | uniq -c | sort -nr | head -n $TOP
