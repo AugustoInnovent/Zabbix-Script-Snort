@@ -13,7 +13,7 @@ fi
 TMP_LOG=$(mktemp)
 
 for i in 0 1 2; do
-  DIA=$(date -v-"$i"d +%y/%m/%d)   
+  DIA=$(date -v-"$i"d +%m/%d/%y)  
   grep "^$DIA-" "$LOG" >> "$TMP_LOG"
 done
 
@@ -23,8 +23,8 @@ if [ ! -s "$TMP_LOG" ]; then
   exit 0
 fi
 
-PORT_DEST=$(awk -F',' '{print $8}' "$TMP_LOG" | sort | uniq -c | sort -nr | head -n 5 || true)
-PORT_SRC=$(awk -F',' '{print $10}' "$TMP_LOG" | sort | uniq -c | sort -nr | head -n 5 || true)
+PORT_DEST=$(awk -F',' '{print $8}' "$TMP_LOG" | sort | uniq -c | sort -nr | head -n 5)
+PORT_SRC=$(awk -F',' '{print $10}' "$TMP_LOG" | sort | uniq -c | sort -nr | head -n 5)
 
 PORT_STATS="Top Dest Ports (last 3 days):\n$PORT_DEST\n\nTop Source Ports (last 3 days):\n$PORT_SRC"
 
