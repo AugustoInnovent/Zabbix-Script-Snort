@@ -1,6 +1,6 @@
 #!/bin/sh
 
-LOG_FILE="/caminho/para/seu/logfile.log"  # <- ajuste aqui
+LOG_FILE="/var/log/filter.log"  # <- ajuste aqui
 DIAS=3
 
 HOJE=$(date +%s)
