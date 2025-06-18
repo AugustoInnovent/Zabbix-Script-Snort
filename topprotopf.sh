@@ -1,6 +1,6 @@
 #!/bin/sh
 
-LOG="/var/log/filterlog.log"
+LOG="/var/log/filter.log"
 
 
 if [ ! -f "$LOG" ]; then
