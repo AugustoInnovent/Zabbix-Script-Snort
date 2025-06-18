@@ -1,21 +1,19 @@
 #!/bin/sh
 
-LOG="/var/log/filter.log" 
-TMP_FILE="/tmp/protocols_count.txt"
+LOG="/var/log/filterlog.log"
 
-DAY1=$(date -v-0d "+%Y-%m-%d")
-DAY2=$(date -v-1d "+%Y-%m-%d")
-DAY3=$(date -v-2d "+%Y-%m-%d")
 
-[ "$(uname)" != "Darwin" ] && {
-    DAY1=$(date "+%Y-%m-%d")
-    DAY2=$(date -d "-1 day" "+%Y-%m-%d")
-    DAY3=$(date -d "-2 day" "+%Y-%m-%d")
-}
+if [ ! -f "$LOG" ]; then
+  echo "Arquivo de log não encontrado: $LOG"
+  exit 1
+fi
 
-grep -E "$DAY1|$DAY2|$DAY3" "$LOG" | \
-    awk -F',' '{print $20}' | \
-    sort | uniq -c | sort -nr > "$TMP_FILE"
+DATA1=$(date -d "0 days ago" +"%Y-%m-%d")
+DATA2=$(date -d "1 days ago" +"%Y-%m-%d")
+DATA3=$(date -d "2 days ago" +"%Y-%m-%d")
 
-echo "Top protocolos dos últimos 3 dias:"
-cat "$TMP_FILE"
+
+grep -E "$DATA1|$DATA2|$DATA3" "$LOG" | \
+awk -F, '{print tolower($15)}' | \
+sort | uniq -c | sort -nr | \
+awk '{printf "%s: %d\n", $2, $1}'
