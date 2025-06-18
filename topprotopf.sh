@@ -1,37 +1,21 @@
 #!/bin/sh
 
-LOG="/var/log/filterlog.log"
+LOG="/var/log/filter.log" 
+TMP_FILE="/tmp/protocols_count.txt"
 
-if [ ! -f "$LOG" ]; then
-    echo "Log não encontrado: $LOG"
-    exit 1
-fi
+DAY1=$(date -v-0d "+%Y-%m-%d")
+DAY2=$(date -v-1d "+%Y-%m-%d")
+DAY3=$(date -v-2d "+%Y-%m-%d")
 
-DATES=$(for i in 0 1 2 3; do date -d "-$i days" "+%Y-%m-%d"; done)
-
-awk -v dates="$DATES" '
-BEGIN {
-    split(dates, daylist)
-    for (i in daylist) daymap[daylist[i]] = 1
-    FS = ","
+[ "$(uname)" != "Darwin" ] && {
+    DAY1=$(date "+%Y-%m-%d")
+    DAY2=$(date -d "-1 day" "+%Y-%m-%d")
+    DAY3=$(date -d "-2 day" "+%Y-%m-%d")
 }
-{
-    match($0, /^[^ ]+ +[^ ]+ +[^T]+T[0-9:.+-]+/, ts)
-    split(ts[0], datepart, "T")
-    logdate = datepart[1]
 
-    if (logdate in daymap) {
-        for (i = 1; i <= NF; i++) {
-            if ($i ~ /^(UDP|TCP|ICMP|icmp|udp|tcp)$/) {
-                proto[toupper($i)]++
-                break
-            }
-        }
-    }
-}
-END {
-    for (p in proto) {
-        printf "%s %d\n", p, proto[p]
-    }
-}
-' "$LOG" | sort -k2 -nr
+grep -E "$DAY1|$DAY2|$DAY3" "$LOG" | \
+    awk -F',' '{print $20}' | \
+    sort | uniq -c | sort -nr > "$TMP_FILE"
+
+echo "Top protocolos dos últimos 3 dias:"
+cat "$TMP_FILE"
