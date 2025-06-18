@@ -1,37 +1,35 @@
 #!/bin/sh
 
-LOG_FILE="/var/log/filter.log"  # <- ajuste aqui
+LOG_FILE="/var/log/filter.log" 
 DIAS=3
 
-HOJE=$(date +%s)
-LIMITE=$(date -v -${DIAS}d +%s)  
+LIMITE_EPOCH=$(date -d "-${DIAS} days" +%s) 
 
-extrair_data_epoch() {
-    linha="$1"
-    data=$(echo "$linha" | awk -F'T' '{print $1}' | awk '{print $2}')
-    date -j -f "%Y-%m-%d" "$data" "+%s" 2>/dev/null  
+awk -v limite="$LIMITE_EPOCH" '
+function get_epoch(date_str) {
+    gsub("T.*", "", date_str)
+    cmd = "date -d \"" date_str "\" +%s"
+    cmd | getline epoch
+    close(cmd)
+    return epoch
 }
-
-awk -v hoje="$HOJE" -v limite="$LIMITE" '
 {
-    split($3, dt, "T");  # Extrai data
-    data = dt[1];
-    cmd = "date -j -f %Y-%m-%d " data " +%s";  # Para Linux: cmd = "date -d " data " +%s"
-    cmd | getline epoch;
-    close(cmd);
+    data_iso = $2
+    epoch = get_epoch(data_iso)
     if (epoch >= limite) {
         for (i=1; i<=NF; i++) {
             if ($i ~ /^[A-Z]+$/) {
-                proto = $i;
-                counts[proto]++;
-                break;
+                proto = $i
+                counts[proto]++
+                break
             }
         }
     }
 }
 END {
-    print "Ranking de protocolos nos últimos 3 dias:\n";
+    print "Ranking de protocolos nos últimos 3 dias:\n"
     for (p in counts) {
-        printf "%s: %d\n", p, counts[p];
+        printf "%s: %d\n", p, counts[p]
     }
 }' "$LOG_FILE" | sort -k2 -nr
+
