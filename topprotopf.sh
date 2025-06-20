@@ -6,7 +6,6 @@ ZABBIX_KEY="net.topprotos.pf"
 LOG_FILE="/var/log/filter.log"
 TMP_FILE="/tmp/top_protos.txt"
 
-# Epoch 3 dias atrás
 LIMITE_EPOCH=$(date -j -v-3d "+%s")
 
 awk -v limite="$LIMITE_EPOCH" '
