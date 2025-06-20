@@ -9,33 +9,34 @@ TMP_FILE="/tmp/top_protos.txt"
 LIMITE_EPOCH=$(date -j -v-3d "+%s")
 
 awk -v limite="$LIMITE_EPOCH" '
-function get_epoch(date_str, date_part, time_part, clean, cmd, epoch) {
-    # Divide data e hora
+function get_epoch(date_str, date_part, time_part, hh, mm, ss, clean, cmd, epoch) {
     split(date_str, parts, "T")
-    date_part = parts[1]        # "2025-06-20"
-    time_part = parts[2]        # "09:30:00.123456-03:00"
+    if (length(parts) < 2) return 0 
 
-    # Formata data
-    gsub("-", "", date_part)    # "20250620"
+    date_part = parts[1]
+    time_part = parts[2]
 
-    # Separa hora, minuto, segundo
+    gsub("-", "", date_part)
+
     split(time_part, tparts, ":")
+    if (length(tparts) < 3) return 0  # ignora se incompleto
+
     hh = tparts[1]
     mm = tparts[2]
-    ss = substr(tparts[3], 1, 2)  # "00" (do início de "00.123456")
+    ss = substr(tparts[3], 1, 2)
 
-    # Monta formato aceito por date do FreeBSD
+    if (hh !~ /^[0-9]+$/ || mm !~ /^[0-9]+$/ || ss !~ /^[0-9]+$/) return 0
+
     clean = date_part hh mm "." ss
-
     cmd = "date -j -f \"%Y%m%d%H%M.%S\" \"" clean "\" +%s"
     cmd | getline epoch
     close(cmd)
     return epoch
 }
 {
-    data_iso = $2  # Ex: 2025-06-20T09:30:00.123456-03:00
+    data_iso = $2 
     epoch = get_epoch(data_iso)
-    if (epoch >= limite) {
+    if (epoch >= limite && epoch > 0) {
         for (i=1; i<=NF; i++) {
             if ($i ~ /^[A-Z]+$/) {
                 proto = $i
