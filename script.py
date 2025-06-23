@@ -2,7 +2,9 @@ import requests
 from collections import Counter
 import subprocess
 import json
+import urllib3
 
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 UNIFI_CONTROLLER = "https://192.168.41.13:8443"
 USERNAME = "admin"
