@@ -11,21 +11,24 @@ command -v zabbix_sender >/dev/null 2>&1 || {
 
 today=$(date +"%Y-%m-%d")
 
+today=$(date +%Y-%m-%d)
 awk -v today="$today" '
-  /<134>1 / && /filterlog/ {
-      if (match($0, /<134>1 ([0-9]{4}-[0-9]{2}-[0-9]{2})T.*filterlog.*(tcp|udp|icmp)/, m)) {
-          if (m[1] == today) {
-              proto = tolower(m[2])
-              count[proto]++
-          }
-      }
-  }
-  END {
-      for (p in count) {
-          printf "%s %d\n", p, count[p]
-      }
-  }
-' "$LOG_FILE" | while read -r proto cnt; do
+/<134>1 / && /filterlog/ {
+    split($0, a, "T")
+    date = a[1]
+    proto = ""
+    if ($0 ~ / tcp /) proto = "tcp"
+    else if ($0 ~ / udp /) proto = "udp"
+    else if ($0 ~ / icmp /) proto = "icmp"
+    if (proto != "" && date == today) {
+        count[proto]++
+    }
+}
+END {
+    for (p in count) {
+        printf "%s %d\n", p, count[p]
+    }
+}' /var/log/filter.log | while read -r proto cnt; do
     item_key="${ZABBIX_KEY}[${proto}]"
 
     zabbix_sender -z "$ZABBIX_SERVER" -s "$ZABBIX_HOST" \
