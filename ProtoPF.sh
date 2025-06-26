@@ -9,8 +9,6 @@ command -v zabbix_sender >/dev/null 2>&1 || {
 [ -r "$LOG_FILE" ] || {
   echo "Erro: não foi possível ler $LOG_FILE"; exit 1; }
 
-today=$(date +"%Y-%m-%d")
-
 today=$(date +%Y-%m-%d)
 awk -v today="$today" '
 /<134>1 / && /filterlog/ {
