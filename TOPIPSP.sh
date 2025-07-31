@@ -1,6 +1,6 @@
 #!/bin/sh
 
-ZABBIX_HOST="PFSENSE-FOR"
+ZABBIX_HOST="PFSENSE-SP"
 ZABBIX_SERVER="74.163.81.252"
 ZABBIX_KEY="net.topips.snort"
 LOG="/var/log/snort/snort_igc122391/alert"
@@ -21,4 +21,4 @@ while read -r count ip; do
 done < "$TMP_FILE"
 JSON="$JSON}"
 
-zabbix_sender -z 74.163.81.252 -s "PFSENSE-FOR" -k "$ZABBIX_KEY" -o "$JSON"
+zabbix_sender -z 74.163.81.252 -s "PFSENSE-SP" -k "$ZABBIX_KEY" -o "$JSON"
