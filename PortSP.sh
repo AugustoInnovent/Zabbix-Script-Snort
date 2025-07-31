@@ -1,6 +1,6 @@
 #!/bin/sh
 
-ZABBIX_HOST="PFSENSE-FOR"
+ZABBIX_HOST="PFSENSE-SP"
 ZABBIX_SERVER="74.163.81.252"
 ZABBIX_KEY="net.topports.snort"
 LOG="/var/log/snort/snort_igc122391/alert"
@@ -28,6 +28,6 @@ PORT_SRC=$(awk -F',' '{print $10}' "$TMP_LOG" | sort | uniq -c | sort -nr | head
 
 PORT_STATS="Top Dest Ports (last 3 days):\n$PORT_DEST\n\nTop Source Ports (last 3 days):\n$PORT_SRC"
 
-/usr/local/bin/zabbix_sender -z 74.163.81.252 -s "PFSENSE-FOR" -k "$ZABBIX_KEY" -o "$PORT_STATS"
+/usr/local/bin/zabbix_sender -z 74.163.81.252 -s "PFSENSE-SP" -k "$ZABBIX_KEY" -o "$PORT_STATS"
 
 rm -f "$TMP_LOG"
