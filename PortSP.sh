@@ -3,7 +3,7 @@
 ZABBIX_HOST="PFSENSE-SP"
 ZABBIX_SERVER="74.163.81.252"
 ZABBIX_KEY="net.topports.snort"
-LOG="/var/log/snort/snort_igc122391/alert"
+LOG="/var/log/snort/snort_igc231737/alert"
 
 if [ ! -f "$LOG" ]; then
   echo "Arquivo de log não encontrado: $LOG"
