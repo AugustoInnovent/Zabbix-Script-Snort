@@ -1,6 +1,6 @@
 #!/bin/sh
 
-LOG_FILE="/var/log/snort/snort_igc122391/alert"
+LOG_FILE="/var/log/snort/snort_igc231737/alert"
 
 TODAY=$(date +"%m/%d/%y")
 
