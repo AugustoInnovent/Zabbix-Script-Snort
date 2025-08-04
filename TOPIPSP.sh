@@ -2,7 +2,7 @@
 
 ZABBIX_HOST="PFSENSE-SP"
 ZABBIX_SERVER="74.163.81.252"
-ZABBIX_KEY="net.topips.snort"
+ZABBIX_KEY="net.topip.snort"
 LOG="/var/log/snort/snort_igc231737/alert"
 TMP_FILE="/tmp/snort_top_ips.txt"
 
